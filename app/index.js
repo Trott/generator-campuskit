@@ -21,6 +21,7 @@ CampuskitGenerator.prototype.askFor = function askFor() {
 
   // have Yeoman greet the user.
   console.log(this.yeoman);
+  console.log('Out of the box I include HTML5 Mobile Boilerplate, FastClick, Zepto, Modernizr, and Normalize.css.');
 
   var prompts = [
     // {
@@ -31,7 +32,18 @@ CampuskitGenerator.prototype.askFor = function askFor() {
     // }
     {
       name: 'siteName',
-      message: 'What would you like to name your site?'
+      message: 'What would you like to name your site?',
+      default: 'My site'
+    },
+    {
+      name: 'description',
+      message: 'Provide a brief description of the site.',
+      default: 'An awesome CampusKit site.'
+    },
+    {
+      name: 'gaid',
+      message: 'If you know your Google Analytics code, enter it.',
+      default: 'UA-XXXXX-X'
     }
   ];
 
@@ -39,28 +51,22 @@ CampuskitGenerator.prototype.askFor = function askFor() {
     this.siteName = props.siteName;
     this.slugSiteName = this.siteName.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 
+    this.description = props.description;
+
+    this.gaid = props.gaid;
+
     cb();
   }.bind(this));
 };
 
 CampuskitGenerator.prototype.getCampusKit = function getCampusKit() {
   var cb = this.async();
-  // this.remote('trott', 'campuskit', 'v0.4.2', function (err, remote) {
-  //     if (err) {
-  //       return cb(err);
-  //     }
-  //     remote.copy('Gruntfile.js', 'Gruntfile.js');
-  //     remote.copy('LICENSE', 'LICENSE');
-  //     remote.copy('bower.json', 'bower.json');
-  //     remote.copy('phonegap', 'phonegap');
-  //     cb();
-  //   }
-  // );
   this.bowerInstall('campuskit', {}, function (err) {
     if (err) {
       return cb(err);
     }
     fs.renameSync('components/CampusKit/Gruntfile.js', 'Gruntfile.js');
+    fs.renameSync('components/CampusKit/bower.json', 'bower.json');
     fs.renameSync('components/CampusKit/package.json', 'package.json');
     fs.renameSync('components/CampusKit/phonegap', 'phonegap');
     fs.renameSync('components/CampusKit/sites', 'sites');
@@ -69,12 +75,37 @@ CampuskitGenerator.prototype.getCampusKit = function getCampusKit() {
   });
 };
 
+CampuskitGenerator.prototype.h5bpm = function h5bpm() {
+  this.template('index.html', 'sites/' + this.slugSiteName + '/html/index.html');
+
+  this.copy('apple-touch-icon-114x114-precomposed.png',
+    'sites/' + this.slugSiteName + '/img/touch/apple-touch-icon-114x114-precomposed.png');
+  this.copy('apple-touch-icon-114x114-precomposed.png',
+    'sites/' + this.slugSiteName + '/img/touch/apple-touch-icon-144x144-precomposed.png');
+  this.copy('apple-touch-icon-114x114-precomposed.png',
+    'sites/' + this.slugSiteName + '/img/touch/apple-touch-icon-57x57-precomposed.png');
+  this.copy('apple-touch-icon-114x114-precomposed.png',
+    'sites/' + this.slugSiteName + '/img/touch/apple-touch-icon-72x72-precomposed.png');
+  this.copy('apple-touch-icon-114x114-precomposed.png',
+    'sites/' + this.slugSiteName + '/img/touch/apple-touch-icon-precomposed.png');
+  this.copy('apple-touch-icon-114x114-precomposed.png',
+    'sites/' + this.slugSiteName + '/img/touch/apple-touch-icon.png');
+  this.copy('main.css',
+    'sites/' + this.slugSiteName + '/css/main.css');
+  this.copy('normalize.css',
+    'sites/' + this.slugSiteName + '/css/normalize.css');
+  this.copy('modernizr-2.6.2.min.js',
+    'sites/' + this.slugSiteName + '/js/modernizr-2.6.2.min.js');
+  this.copy('zepto.min.js',
+    'sites/' + this.slugSiteName + '/js/zepto.min.js');
+  this.copy('helper.src.js',
+    'sites/' + this.slugSiteName + '/js/helper.src.js');
+};
+
 CampuskitGenerator.prototype.app = function app() {
   this.mkdir('sites/' + this.slugSiteName);
   var dirs = ['html', 'css', 'js', 'img'];
   for (var index in dirs) {
     this.mkdir('sites/' + this.slugSiteName + '/' + dirs[index]);
   }
-
-  this.copy('_bower.json', 'bower.json');
 };
