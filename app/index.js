@@ -102,6 +102,11 @@ CampuskitGenerator.prototype.h5bpm = function h5bpm() {
     'sites/' + this.slugSiteName + '/js/helper.src.js');
 };
 
+CampuskitGenerator.prototype.phonegap = function phonegap() {
+  this.directory('phonegap',
+    'phonegap/campuskit_templates/' + this.slugSiteName);
+};
+
 CampuskitGenerator.prototype.app = function app() {
   this.mkdir('sites/' + this.slugSiteName);
   var dirs = ['html', 'css', 'js', 'img'];
