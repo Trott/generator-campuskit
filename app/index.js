@@ -1,8 +1,9 @@
 'use strict';
 var util = require('util');
 var path = require('path');
-var fs = require('fs');
 var yeoman = require('yeoman-generator');
+var ncp = require('ncp').ncp;
+var async = require('async');
 
 var CampuskitGenerator = module.exports = function CampuskitGenerator(args, options, config) {
   yeoman.generators.Base.apply(this, arguments);
@@ -61,17 +62,33 @@ CampuskitGenerator.prototype.askFor = function askFor() {
 
 CampuskitGenerator.prototype.getCampusKit = function getCampusKit() {
   var cb = this.async();
+
   this.bowerInstall('campuskit', {}, function (err) {
     if (err) {
       return cb(err);
     }
-    fs.renameSync('components/CampusKit/Gruntfile.js', 'Gruntfile.js');
-    fs.renameSync('components/CampusKit/bower.json', 'bower.json');
-    fs.renameSync('components/CampusKit/package.json', 'package.json');
-    fs.renameSync('components/CampusKit/phonegap', 'phonegap');
-    fs.renameSync('components/CampusKit/sites', 'sites');
-    fs.renameSync('components/CampusKit/src', 'src');
-    cb();
+
+    async.parallel(
+      [
+        function (callback) {
+          ncp('bower_components/CampusKit/Gruntfile.js', 'Gruntfile.js', callback);
+        },
+        function (callback) {
+          ncp('bower_components/CampusKit/bower.json', 'bower.json', callback);
+        },
+        function (callback) {
+          ncp('bower_components/CampusKit/package.json', 'package.json', callback);
+        },
+        function (callback) {
+          ncp('bower_components/CampusKit/phonegap', 'phonegap', callback);
+        },
+        function (callback) {
+          ncp('bower_components/CampusKit/sites', 'sites', callback);
+        },
+        function (callback) {
+          ncp('bower_components/CampusKit/src', 'src', callback);
+        }
+      ], cb);
   });
 };
 
