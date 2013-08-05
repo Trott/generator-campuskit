@@ -71,9 +71,6 @@ CampuskitGenerator.prototype.getCampusKit = function getCampusKit() {
     async.parallel(
       [
         function (callback) {
-          ncp('bower_components/CampusKit/Gruntfile.js', 'Gruntfile.js', callback);
-        },
-        function (callback) {
           ncp('bower_components/CampusKit/bower.json', 'bower.json', callback);
         },
         function (callback) {
@@ -94,6 +91,7 @@ CampuskitGenerator.prototype.getCampusKit = function getCampusKit() {
 
 CampuskitGenerator.prototype.h5bpm = function h5bpm() {
   this.template('index.html', 'sites/' + this.slugSiteName + '/html/index.html');
+  this.template('Gruntfile.js', 'Gruntfile.js');
 
   this.copy('apple-touch-icon-114x114-precomposed.png',
     'sites/' + this.slugSiteName + '/img/touch/apple-touch-icon-114x114-precomposed.png');
