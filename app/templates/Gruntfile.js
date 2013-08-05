@@ -2,8 +2,8 @@
 module.exports = function (grunt) {
     'use strict';
 
-    var siteOption = grunt.option('site') || '<%= _.escapeHTML(slugSiteName) %>'
-;
+    var siteOption = grunt.option('site') || '<%= _.escapeHTML(slugSiteName) %>';
+
     var platformOption = grunt.option('platform') || 'web';
 
     if (platformOption in ['web', 'phonegap']) {
@@ -21,7 +21,6 @@ module.exports = function (grunt) {
     }
 
     var configCopyMainFiles = [
-        {expand: true, dot: true, cwd: site + '/html', src: ['**'], dest: dest},
         {expand: true, cwd: site, src: ['appcache/**'], dest: dest},
         {expand: true, cwd: site, src: ['font/**'], dest: dest},
         {expand: true, cwd: site, src: ['img/**'], dest: dest}
@@ -94,9 +93,12 @@ module.exports = function (grunt) {
             }
         },
 
-        copy : {
+        copy: {
             main: {
                 files: configCopyMainFiles
+            },
+            html: {
+                files: [{expand: true, dot: true, cwd: site + '/html', src: ['**'], dest: dest}]
             }
         },
 
@@ -223,7 +225,11 @@ module.exports = function (grunt) {
                 tasks: ['cssmin:minify']
             },
             html: {
-                files: [ site + '/html/**', site + '/img/**', site + '/font/**', site + '/appcache/**'],
+                files: [ site + '/html/**'],
+                tasks: ['copy:html']
+            },
+            other: {
+                files: [ site + '/img/**', site + '/font/**', site + '/appcache/**'],
                 tasks: ['copy']
             },
             livereload: {
