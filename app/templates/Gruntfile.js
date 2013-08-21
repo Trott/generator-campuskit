@@ -3,7 +3,6 @@ module.exports = function (grunt) {
     'use strict';
 
     var siteOption = grunt.option('site') || '<%= _.escapeHTML(slugSiteName) %>';
-
     var platformOption = grunt.option('platform') || 'web';
 
     if (platformOption in ['web', 'phonegap']) {
@@ -21,6 +20,7 @@ module.exports = function (grunt) {
     }
 
     var configCopyMainFiles = [
+        {expand: true, dot: true, cwd: site + '/html', src: ['**'], dest: dest},
         {expand: true, cwd: site, src: ['appcache/**'], dest: dest},
         {expand: true, cwd: site, src: ['font/**'], dest: dest},
         {expand: true, cwd: site, src: ['img/**'], dest: dest}
@@ -93,12 +93,9 @@ module.exports = function (grunt) {
             }
         },
 
-        copy: {
+        copy : {
             main: {
                 files: configCopyMainFiles
-            },
-            html: {
-                files: [{expand: true, dot: true, cwd: site + '/html', src: ['**'], dest: dest}]
             }
         },
 
@@ -124,12 +121,12 @@ module.exports = function (grunt) {
                 boss: true,
                 eqnull: true,
                 globals: {
-                    "angular": true,
-                    "FastClick": true,
-                    "google": false,
-                    "Hogan": false,
-                    "Modernizr": false,
-                    "UCSF": false
+                    'angular': true,
+                    'FastClick': true,
+                    'google': false,
+                    'Hogan': false,
+                    'Modernizr': false,
+                    'UCSF': false
                 }
             },
             beforeconcat: {
@@ -148,8 +145,8 @@ module.exports = function (grunt) {
                 options: {
                     es5: true,
                     globals: {
-                        "module": false,
-                        "require": false
+                        'module': false,
+                        'require': false
                     }
                 },
                 src: ['Gruntfile.js']
@@ -159,6 +156,14 @@ module.exports = function (grunt) {
         open: {
             server: {
                 url: 'http://localhost:8000'
+            }
+        },
+
+        release: {
+            options: {
+                file: 'bower.json',
+                npm: false,
+                tagName: 'v<%= version %>'
             }
         },
 
@@ -178,6 +183,25 @@ module.exports = function (grunt) {
                 recursive: true,
                 syncDest: true,
                 args: ['--links']
+            }
+        },
+
+        sass: {
+            dist: {
+                files: [
+                    {
+                        cwd: site + '/scss',
+                        dest: site + '/css',
+                        expand: true,
+                        ext: '.css',
+                        src: ['[a-zA-Z]**.scss']
+                    }
+                ],
+                options: {
+                    includePaths: [
+                        site + '/scss'
+                    ]
+                },
             }
         },
 
@@ -220,16 +244,16 @@ module.exports = function (grunt) {
                 files: [site + '/js/**/*.js'],
                 tasks: ['js']
             },
+            scss: {
+                files: [site + '/scss/**.scss'],
+                tasks: ['sass:dist']
+            },
             css: {
                 files: [site + '/css/**'],
                 tasks: ['cssmin:minify']
             },
             html: {
-                files: [ site + '/html/**'],
-                tasks: ['copy:html']
-            },
-            other: {
-                files: [ site + '/img/**', site + '/font/**', site + '/appcache/**'],
+                files: [ site + '/html/**', site + '/img/**', site + '/font/**', site + '/appcache/**'],
                 tasks: ['copy']
             },
             livereload: {
@@ -251,10 +275,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-open');
+    grunt.loadNpmTasks('grunt-release');
     grunt.loadNpmTasks('grunt-rsync');
+    grunt.loadNpmTasks('grunt-sass');
 
     grunt.registerTask('js', ['jshint:beforeconcat', 'concat:partial', 'jshint:afterconcat', 'uglify:*', 'concat:full']);
-    grunt.registerTask('default', ['jshint:gruntfile', 'clean', 'bower:install', 'js', 'cssmin:minify', 'copy']);
+    grunt.registerTask('default', ['jshint:gruntfile', 'clean', 'bower:install', 'js', 'sass:dist', 'cssmin:minify', 'copy']);
     grunt.registerTask('server', ['connect:server:keepalive']);
     grunt.registerTask('build', ['default']);
     grunt.registerTask('run', ['connect:server', 'open', 'watch']);
