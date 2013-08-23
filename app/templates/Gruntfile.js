@@ -159,14 +159,6 @@ module.exports = function (grunt) {
             }
         },
 
-        release: {
-            options: {
-                file: 'bower.json',
-                npm: false,
-                tagName: 'v<%= version %>'
-            }
-        },
-
         rsync: {
             'deploy-staging': {
                 src: 'dist/',
@@ -275,7 +267,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-open');
-    grunt.loadNpmTasks('grunt-release');
     grunt.loadNpmTasks('grunt-rsync');
     grunt.loadNpmTasks('grunt-sass');
 
