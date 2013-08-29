@@ -1,6 +1,6 @@
 {
   "name": "generator-campuskit",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "A Yeoman generator for CampusKit",
   "keywords": [
     "yeoman-generator"
