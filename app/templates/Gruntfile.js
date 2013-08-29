@@ -21,7 +21,6 @@ module.exports = function (grunt) {
 
     var configCopyMainFiles = [
         {expand: true, dot: true, cwd: site + '/html', src: ['**'], dest: dest},
-        {expand: true, cwd: site, src: ['appcache/**'], dest: dest},
         {expand: true, cwd: site, src: ['font/**'], dest: dest},
         {expand: true, cwd: site, src: ['img/**'], dest: dest}
     ];
@@ -105,6 +104,18 @@ module.exports = function (grunt) {
                 cwd: site + '/css',
                 src: ['*.css', '!*.min.css'],
                 dest: dest + '/css/'
+            }
+        },
+
+        inline_angular_templates: {
+            dist: {
+                options: {
+                    base: site + '/angular_templates',
+                    selector: '#ng-app'
+                },
+                files: {
+                    'dist/index.html': [site + '/angular_templates/*/*.html']
+                }
             }
         },
 
@@ -197,6 +208,14 @@ module.exports = function (grunt) {
             }
         },
 
+        smoosher: {
+            default_options: {
+                files: {
+                    'dist/index.html': 'dist/index.html',
+                },
+            },
+        },
+
         uglify: {
             options: {
                 compress: {
@@ -205,7 +224,7 @@ module.exports = function (grunt) {
             },
             fastclick: {
                 files: {
-                    'tmp/fastclick.min.js': ['lib/fastclick/lib/fastclick.js']
+                    'tmp/fastclick.min.js': ['lib/fastclick/fastclick.js']
                 }
             },
             campuskit: {
@@ -234,7 +253,7 @@ module.exports = function (grunt) {
             },
             js: {
                 files: [site + '/js/**/*.js'],
-                tasks: ['js']
+                tasks: ['js', 'copy', 'inline_angular_templates', 'smoosher']
             },
             scss: {
                 files: [site + '/scss/**.scss'],
@@ -245,8 +264,8 @@ module.exports = function (grunt) {
                 tasks: ['cssmin:minify']
             },
             html: {
-                files: [ site + '/html/**', site + '/img/**', site + '/font/**', site + '/appcache/**'],
-                tasks: ['copy']
+                files: [ site + '/html/**', site + '/img/**', site + '/font/**', site + '/angular_templates/**'],
+                tasks: ['copy', 'inline_angular_templates', 'smoosher']
             },
             livereload: {
                 options: {
@@ -266,12 +285,14 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-html-smoosher');
+    grunt.loadNpmTasks('grunt-inline-angular-templates');
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks('grunt-rsync');
     grunt.loadNpmTasks('grunt-sass');
 
     grunt.registerTask('js', ['jshint:beforeconcat', 'concat:partial', 'jshint:afterconcat', 'uglify:*', 'concat:full']);
-    grunt.registerTask('default', ['jshint:gruntfile', 'clean', 'bower:install', 'js', 'sass:dist', 'cssmin:minify', 'copy']);
+    grunt.registerTask('default', ['jshint:gruntfile', 'clean', 'bower:install', 'js', 'sass:dist', 'cssmin:minify', 'copy', 'inline_angular_templates', 'smoosher']);
     grunt.registerTask('server', ['connect:server:keepalive']);
     grunt.registerTask('build', ['default']);
     grunt.registerTask('run', ['connect:server', 'open', 'watch']);
